@@ -60,7 +60,7 @@ vector<HistogramCPU> FeaturesCPU::computeAllHist(vector<string> frames)
 	for(int i=0; i<(int)frames.size(); i++)
 	{
 		cv::Mat img = cv::imread(frames[i]);
-		float mean = HistogramCPU(img, BINS, i).stdDev();
+		float mean = HistogramCPU(img, BINS, i+1).stdDev();
 
 		//considera apenas frames com determinado desvio padrao
 		if(mean < 0.23)
@@ -69,7 +69,7 @@ vector<HistogramCPU> FeaturesCPU::computeAllHist(vector<string> frames)
 			cv::Mat imgHSV;
 			cv::cvtColor(img, imgHSV, CV_RGB2HSV);
 
-			HistogramCPU hist_aux = HistogramCPU(imgHSV, BINS, i);
+			HistogramCPU hist_aux = HistogramCPU(imgHSV, BINS, i+1);
 
 			vector<float> vaux = hist_aux.getHistogram();
 			hist_aux.setHistogram(vector<float>(vaux.begin(), vaux.begin()+BINS));

@@ -3,6 +3,7 @@
 #include "Results.h"
 
 #include <vector>
+#include <set>
 #include <iterator>
 #include <map>
 #include <iostream>
@@ -13,8 +14,8 @@ float ClusteringCPU::euclidianDist(HistogramCPU h1, HistogramCPU h2)
 {
 	float result = 0.0;
 	for(int i=0; i<(int)h1.getHistogram().size(); i++)
-		result += sqrt(pow(h1.getHistPos(i) - h2.getHistPos(i), 2));
-	return result;
+		result += pow(h1.getHistPos(i) - h2.getHistPos(i), 2);
+	return sqrt(result);
 }
 
 float ClusteringCPU::euclidianDist(HistogramCPU h1, vector<float> cluster)
@@ -22,27 +23,26 @@ float ClusteringCPU::euclidianDist(HistogramCPU h1, vector<float> cluster)
 	float result = 0.0;
 	for(int i=0; i<BINS; i++)
 	{
-		result += sqrt(pow(h1.getHistPos(i) - cluster[i], 2));
+		result += pow(h1.getHistPos(i) - cluster[i], 2);
 	}
-	return result;
+	return sqrt(result);
 }
 
 float ClusteringCPU::euclidianDist(vector<float> h1, vector<float> h2)
 {
 	float result = 0.0;
 	for(int i=0; i<BINS; i++)
-		result += sqrt(pow(h1[i] - h2[i], 2));
-	return result;
+		result += pow(h1[i] - h2[i], 2);
+	return sqrt(result);
 }
 void ClusteringCPU::estimateK()
 {
-	double limiar = 2.0;  //0.5 para histograma normalizado
+	double limiar = 0.4;
 	int k_aux = 0;
 	while(k_aux == 0 && limiar > -1)
 	{
 		for(int i=0; i<(int)features.size()-1; i++)
 		{
-			//cout << euclidianDist(features[i+1].getHistogramNorm(), features[i].getHistogramNorm()) << endl;
 			if(euclidianDist(features[i+1].getHistogramNorm(), features[i].getHistogramNorm()) > limiar)
 				k_aux++;
 		}
@@ -50,6 +50,7 @@ void ClusteringCPU::estimateK()
 			limiar--;
 	}
 	this->k = k_aux;
+	cout << k_aux << endl;
 }
 
 int ClusteringCPU::findNearestCluster(HistogramCPU hist)
@@ -60,7 +61,6 @@ int ClusteringCPU::findNearestCluster(HistogramCPU hist)
 	for(int i=1; i<(int)clusters.size(); i++)
 	{
 		float dist = euclidianDist(hist, clusters[i]);
-		//cout << i << "=" << dist << endl;
 		if(dist < minDist)
 		{
 			minDist = dist;
@@ -74,7 +74,7 @@ void ClusteringCPU::kmeans()
 {
 	int bins = BINS;
 	int threshold = 0;
-	int delta;
+	float delta;
 
 	//estima k inicial
 	estimateK();
@@ -97,7 +97,6 @@ void ClusteringCPU::kmeans()
 		for(int j=0; j<bins; j++)
 			clusters[i][j] = features[i].getHistPos(j);
 	}
-
 	int loop = 0;
 	do
 	{
@@ -106,7 +105,7 @@ void ClusteringCPU::kmeans()
 		for(int i=0; i<(int)features.size(); i++) {
 
 			//encontra cluster mais proximo
-			int nearest = findNearestCluster(features[i]);
+			int nearest = findNearestCluster(features[i]);			
 			if(framesClass[i] != nearest)
 				delta += 1.0;
 
@@ -128,12 +127,8 @@ void ClusteringCPU::kmeans()
 			}
 			newClusterSize[i] = 0;
 		}
-
 		delta /= features.size();
-		//cout << "delta: " << delta << " loop: " << loop << endl;
 	}while(delta > threshold && loop++ < 500);
-
-
 }
 
 void ClusteringCPU::findKeyframes()
@@ -145,7 +140,9 @@ void ClusteringCPU::findKeyframes()
 		for(int j=0; j<(int)features.size(); j++)
 		{
 			if(framesClass[j] == i)
+			{
 				minDist.insert(pair<double, HistogramCPU>(euclidianDist(features[j],clusters[i]), features[j]));
+			}
 		}
 
 		if(minDist.size() == 0)
@@ -155,7 +152,6 @@ void ClusteringCPU::findKeyframes()
 		if((*it).first >= 0)
 			keyframes.push_back((*it).second);
 	}
-	//cout << "keyframes: " << keyframes.size() << endl;
 }
 
 bool sortfunction(HistogramCPU h1, HistogramCPU h2)
@@ -169,18 +165,20 @@ void ClusteringCPU::removeSimilarKeyframes()
 
 	for(int i=0; i<(int)keyframes.size()-1; i++)
 	{
-		for(int j=i+1; j<(int)keyframes.size(); j++)
+		int j=i+1;
+		while(j<(int)keyframes.size())
 		{
-			//cout << euclidianDist(keyframes[i].getHistogramNorm(), keyframes[j].getHistogramNorm()) << endl;
-			if(euclidianDist(keyframes[i].getHistogramNorm(), keyframes[j].getHistogramNorm())<0.5)
+			if(euclidianDist(keyframes[i].getHistogramNorm(), keyframes[j].getHistogramNorm())<0.3)
 			{
 				vector<HistogramCPU>::iterator it;
 				it = keyframes.begin();
 				advance(it,j);
 				keyframes.erase(it);
+				j--;
 			}
+			else
+				j++;
 		}
 	}
-	//cout << "keyframes: " << keyframes.size() << endl;
 }
 

@@ -1,9 +1,9 @@
 //============================================================================
 // Name        : vsumm-cpu.cpp
-// Author      : 
+// Author      : Suellen Almeida / based on Sandra Avila code
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
+// Description : Video sumarization
 //============================================================================
 
 #include <iostream>
@@ -134,9 +134,14 @@ int main(int argc, char **argv) {
 		{
 			if(finalKeyframes[j].getIdFrame() >= frameNames.size())
 				continue;
-			FileOperations::copyFile(frameNames[finalKeyframes[j].getIdFrame()], summaryDir);
+			stringstream out;
+			out.fill('0');
+			out << std::right << std::setw(6) << finalKeyframes[j].getIdFrame();
+			string name = frameDir+"/frame-"+out.str()+".jpg";
+
+			FileOperations::copyFile(name, summaryDir);
 		}
-		FileOperations::deleteDir(frameDir);
+		//FileOperations::deleteDir(frameDir);
 		//-----------------------------------------------------------------------//
 
 
