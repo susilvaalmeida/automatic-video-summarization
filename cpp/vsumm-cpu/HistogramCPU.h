@@ -4,11 +4,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/contrib/contrib.hpp>
 
+#define BINS 16
 using namespace std;
 
 class HistogramCPU {
 public:
 	HistogramCPU(cv::Mat& img, int bins, int idFrame);
+	HistogramCPU(cv::Mat& img, int idFrame);
 
 	vector<float> getHistogram(){ return this->hist; }
 	void setHistogram(vector<float> hist){ hist.assign(hist.begin(), hist.end()); }

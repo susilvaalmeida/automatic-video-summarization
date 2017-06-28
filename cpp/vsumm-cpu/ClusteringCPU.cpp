@@ -1,5 +1,4 @@
 #include "ClusteringCPU.h"
-#include "Defines.h"
 #include "Results.h"
 
 #include <vector>
@@ -8,6 +7,7 @@
 #include <map>
 #include <iostream>
 
+#define BINS 16
 using namespace std;
 
 float ClusteringCPU::euclidianDist(HistogramCPU h1, HistogramCPU h2)

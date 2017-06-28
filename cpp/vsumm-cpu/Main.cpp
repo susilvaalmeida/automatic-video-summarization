@@ -10,9 +10,8 @@
 #include <vector>
 #include <iomanip>
 
-#include "Defines.h"
 #include "FileOperations.h"
-#include "DecoderCPU.h"
+#include "VideoSegmentationCPU.h"
 #include "HistogramCPU.h"
 #include "ClusteringCPU.h"
 #include "Results.h"
@@ -26,12 +25,15 @@
 
 using namespace std;
 
+#define BINS 16
+
 
 int main(int argc, char **argv) {
 
 	Results *result;
 	result = Results::getInstance();
-
+	result->setArch("cpu");
+	
 	cv::TickMeter timeGlobal, timeLocal;
 
 	string video_path(argv[1]);
@@ -61,7 +63,7 @@ int main(int argc, char **argv) {
 
 
 		//-----------------------GET VIDEO INFORMATION---------------------------//
-		result->setArch("cpu");
+		
 		result->setVideoName(FileOperations::getSimpleName(videoNames[i]));
 
 		vector<string> splitStr = FileOperations::split(FileOperations::getSimpleName(videoNames[i]), '_');
@@ -78,7 +80,8 @@ int main(int argc, char **argv) {
 		timeGlobal.reset(); timeGlobal.start();
 		timeLocal.reset(); timeLocal.start();
 		//------------------------VIDEO SEGMENTATION-----------------------------//
-		DecoderCPU::saveFrames(videoNames[i], frameDir);
+		VideoSegmentationCPU segmentation(videoNames[i]);
+		segmentation.readSaveFrames(frameDir);
 		//-----------------------------------------------------------------------//
 		timeLocal.stop();
 		result->setDecode(timeLocal.getTimeSec());

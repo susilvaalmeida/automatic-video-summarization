@@ -148,15 +148,16 @@ public:
 
 	void save()
 	{
-		string text = 	arch + "\t" + video_name + "\t" + to_string(length) + "\t" + resolution  + "\t" +
-				to_string(decode) + "\t" + to_string(decode_without_write) + "\t" + to_string(decode_without_gpu_copy) + "\t" +
-				to_string(feat_extraction) + "\t" +  to_string(feat_extraction_gpu_copy) + "\t" +
-				to_string(clustering) + "\t" +
-				to_string(keyframe_extraction) + "\t" +
-				to_string(eliminate_similar) + "\t" +
-				to_string(total) + "\n";
+		string text = 	arch + ";" + video_name + ";" + to_string(length) + ";" + resolution  + ";" +
+				to_string(decode) + ";" + to_string(decode_without_write) + ";" + to_string(decode_without_gpu_copy) + ";" +
+				to_string(feat_extraction) + ";" + to_string(feat_extraction_gpu_copy) + ";" +
+				to_string(clustering) + ";" +
+				to_string(keyframe_extraction) + ";" +
+				to_string(eliminate_similar) + ";" +
+				to_string(total);
 
-		FileOperations::createFile("results-vsumm-cpu.txt",text);
+		string filename = "results-vsumm-" + arch + ".csv"; 
+		FileOperations::createFile(filename,text);
 	}
 protected:
 	Results();

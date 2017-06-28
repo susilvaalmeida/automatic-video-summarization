@@ -12,7 +12,12 @@
 Results *Results::instance = 0;
 
 Results::Results()
-{
+{	
+	//string text = 	"arch;video_name;length;resolution;decode;decode_without_write;decode_without_gpu_copy;feat_extraction;feat_extraction_gpu_copy;clustering;keyframe_extraction;eliminate_similar;total";
+
+	//string filename = "results-vsumm-" + arch + ".csv"; 
+	//FileOperations::createFile(filename,text);
+
 	length = 0;
 
 	decode = -1;

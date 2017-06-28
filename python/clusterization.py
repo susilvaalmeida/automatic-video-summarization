@@ -50,10 +50,7 @@ def find_clusters(features):
     #centroids = [f.hist for f in random.sample(features,k)]
     centroids = [features[i].histF for i in range(k)]
     clusters = {}
-    count=0
     while not has_converged(centroids, old_centroids):
-        print '\n',count
-        count+=1
         old_centroids = centroids
         clusters = cluster_points(features,centroids)
         centroids = evaluate_centroids(old_centroids, clusters)
@@ -71,7 +68,6 @@ def find_keyframes(clusters, centroids):
     keyframes = []
     for key, values in clusters.items():
         distances = [dist(values[i].histF, centroids[key]) for i in range(len(values))]
-        print key, distances
         nearest = distances.index(min(distances))
         keyframes.append(values[nearest])
     return keyframes

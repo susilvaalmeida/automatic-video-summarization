@@ -47,3 +47,14 @@ def extract_features(frames, bins=16):
             hists.append(Histogram(hist_norm,hist_hsv[:bins], i+1))
     return hists
 
+def read_frames_extract_features(frames_folder,frames_list, bins=16):
+    hists = []
+    for i,frame_name in enumerate(frames_list):
+        frame = cv2.imread(frames_folder+'/'+frame_name)
+        hist_hsv = compute_hsv_histogram(frame)
+        if len(hist_hsv) > 0:
+            freq = sum(hist_hsv)/3
+            hist_norm = [x/freq for x in hist_hsv]
+            hist_norm = hist_norm[:bins]
+            hists.append(Histogram(hist_norm,hist_hsv[:bins], i+1))
+    return hists
